@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   fetchPokemonDetail, fetchSpecies, fetchEvolutionChain, findEvolutionNeighbors,
-  officialArtwork, showdownSprite,
+  officialArtwork, officialArtworkShiny, showdownSprite, showdownSpriteShiny,
 } from '../api/pokeapi';
 import type { EvolutionNode, MegaForm } from '../api/pokeapi';
 import type { SpeechSegment } from '../hooks/useSpeech';
@@ -139,6 +139,8 @@ export function PokemonDetailPage() {
     );
   }
 
+  const [shiny, setShiny] = useState(false);
+
   const detail = detailQuery.data;
   const speciesId = speciesQuery.data?.id ?? numericId;
   const neighbors = chainQuery.data
@@ -195,13 +197,22 @@ export function PokemonDetailPage() {
             #{String(detail.id).padStart(4, '0')}
           </span>
           <img
-            src={detail.spriteUrl}
+            src={shiny ? officialArtworkShiny(detail.id) : detail.spriteUrl}
             alt={detail.name}
-            className="w-64 h-64 sm:w-80 sm:h-80 object-contain drop-shadow-2xl"
+            className="w-64 h-64 sm:w-80 sm:h-80 object-contain drop-shadow-2xl transition-opacity duration-300"
           />
-          <h1 className="mt-2 text-4xl sm:text-5xl font-bold text-slate-800 text-center">
-            {displayName}
-          </h1>
+          <div className="mt-2 flex items-center gap-3">
+            <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 text-center">
+              {displayName}
+            </h1>
+            <button
+              onClick={() => setShiny((s) => !s)}
+              title={shiny ? 'Ver versão normal' : 'Ver versão shiny'}
+              className={`text-3xl transition-all active:scale-90 ${shiny ? 'drop-shadow-[0_0_8px_gold]' : 'opacity-40 hover:opacity-80'}`}
+            >
+              ✨
+            </button>
+          </div>
           {speciesQuery.data && (
             <p className="mt-1 text-slate-600 italic">
               {translateCategory(speciesQuery.data.genus)}
@@ -250,7 +261,7 @@ export function PokemonDetailPage() {
         </section>
 
         {/* Animated sprite */}
-        <AnimatedSprite id={detail.id} name={detail.name} />
+        <AnimatedSprite id={detail.id} name={detail.name} shiny={shiny} />
 
         {/* Quick facts */}
         <section className="p-6 sm:p-8 border-t border-slate-100 space-y-4">
@@ -281,8 +292,10 @@ export function PokemonDetailPage() {
 
 // Showdown animated sprite from PokéAPI/sprites — gracefully hides itself if
 // the GIF doesn't exist (rare for newest Gen 9 entries).
-function AnimatedSprite({ id, name }: { id: number; name: string }) {
-  const [hidden, setHidden] = useState(false);
+function AnimatedSprite({ id, name, shiny }: { id: number; name: string; shiny: boolean }) {
+  const [hiddenNormal, setHiddenNormal] = useState(false);
+  const [hiddenShiny, setHiddenShiny] = useState(false);
+  const hidden = shiny ? hiddenShiny : hiddenNormal;
   if (hidden) return null;
   return (
     <section className="p-6 sm:p-8 border-t border-slate-100">
@@ -290,11 +303,12 @@ function AnimatedSprite({ id, name }: { id: number; name: string }) {
       <div className="flex justify-center">
         <div className="rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 p-8 sm:p-10 inline-flex items-center justify-center min-h-[160px]">
           <img
-            src={showdownSprite(id)}
+            key={shiny ? 'shiny' : 'normal'}
+            src={shiny ? showdownSpriteShiny(id) : showdownSprite(id)}
             alt={name}
             className="pixelated h-32 sm:h-40 object-contain"
             style={{ imageRendering: 'pixelated' }}
-            onError={() => setHidden(true)}
+            onError={() => shiny ? setHiddenShiny(true) : setHiddenNormal(true)}
           />
         </div>
       </div>

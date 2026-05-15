@@ -21,7 +21,11 @@
       "Bash(python3 -c \"import urllib.parse; print\\(urllib.parse.quote\\('Quando muitos destes Pokémon se juntam, podem causar uma trovoada enorme.'\\)\\)\")",
       "Bash(curl -s -o /dev/null -w \"short: HTTP %{http_code} size %{size_download}\\\\n\" \"http://localhost:5173/tts?ie=UTF-8&tl=pt-PT&client=tw-ob&q=$\\(python3 -c \"import urllib.parse; print\\(urllib.parse.quote\\('Quando muitos destes Pokémon se juntam, podem causar uma trovoada enorme.'\\)\\)\"\\)\")",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} ct:%{content_type} size:%{size_download}\\\\n\" 'http://localhost:5173/tts?ie=UTF-8&tl=pt-PT&client=tw-ob&q=Ola')",
-      "Bash(curl -s -o /dev/null -w '%{http_code}' https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/__TRACKED_VAR__.gif)"
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/__TRACKED_VAR__.gif)",
+      "Bash(npm_config_registry=https://registry.npmjs.org npm install)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
