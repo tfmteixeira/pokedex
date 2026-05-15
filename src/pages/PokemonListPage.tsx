@@ -10,12 +10,14 @@ const PAGE_SIZE = 30;
 const SCROLL_KEY = 'pokedex_list_state';
 
 type SortOrder = 'numeric' | 'height' | 'weight';
+type SortDir = 'desc' | 'asc';
 
 interface SavedListState {
   search: string;
   region: string | null;
   special: string | null;
   sort: SortOrder;
+  sortDir: SortDir;
   visibleCount: number;
   scrollY: number;
 }
@@ -38,6 +40,7 @@ export function PokemonListPage() {
   const [region, setRegion] = useState<string | null>(saved?.region ?? null);
   const [special, setSpecial] = useState<string | null>(saved?.special ?? null);
   const [sort, setSort] = useState<SortOrder>(saved?.sort ?? 'numeric');
+  const [sortDir, setSortDir] = useState<SortDir>(saved?.sortDir ?? 'desc');
   const [visibleCount, setVisibleCount] = useState(saved?.visibleCount ?? PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const pendingScrollRef = useRef<number | null>(saved?.scrollY ?? null);
@@ -96,10 +99,11 @@ export function PokemonListPage() {
 
   const visibleItems = useMemo(() => {
     const loaded = detailQueries.map((q) => q.data).filter((x): x is PokemonListItem => !!x);
-    if (sort === 'height') return [...loaded].sort((a, b) => b.height - a.height);
-    if (sort === 'weight') return [...loaded].sort((a, b) => b.weight - a.weight);
+    const dir = sortDir === 'desc' ? -1 : 1;
+    if (sort === 'height') return [...loaded].sort((a, b) => (b.height - a.height) * dir);
+    if (sort === 'weight') return [...loaded].sort((a, b) => (b.weight - a.weight) * dir);
     return loaded;
-  }, [detailQueries, sort]);
+  }, [detailQueries, sort, sortDir]);
 
   const stillLoading = detailQueries.some((q) => q.isLoading);
 
@@ -125,8 +129,8 @@ export function PokemonListPage() {
   // every 200ms because saving from useEffect cleanup is unreliable (by the
   // time React's cleanup fires, the old grid has been unmounted and
   // window.scrollY has already been clamped to the shorter detail page).
-  const stateRef = useRef({ visibleCount, search, region, special, sort });
-  stateRef.current = { visibleCount, search, region, special, sort };
+  const stateRef = useRef({ visibleCount, search, region, special, sort, sortDir });
+  stateRef.current = { visibleCount, search, region, special, sort, sortDir };
   useEffect(() => {
     const save = () => {
       sessionStorage.setItem(SCROLL_KEY, JSON.stringify({
@@ -178,19 +182,25 @@ export function PokemonListPage() {
 
       <div className="mb-3 flex gap-2 items-center">
         <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Ordenar</span>
-        {([['numeric', '🔢', 'Número'], ['height', '📏', 'Altura'], ['weight', '⚖️', 'Peso']] as const).map(([key, emoji, label]) => (
-          <button
-            key={key}
-            onClick={() => setSort(key)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-all active:scale-95 ${
-              sort === key
-                ? 'bg-red-500 text-white shadow'
-                : 'bg-white text-slate-600 shadow-sm hover:bg-red-50'
-            }`}
-          >
-            <span>{emoji}</span>{label}
-          </button>
-        ))}
+        {([['numeric', '🔢', 'Número'], ['height', '📏', 'Altura'], ['weight', '⚖️', 'Peso']] as const).map(([key, emoji, label]) => {
+          const active = sort === key;
+          const showDir = active && key !== 'numeric';
+          return (
+            <button
+              key={key}
+              onClick={() => {
+                if (active && key !== 'numeric') setSortDir((d) => d === 'desc' ? 'asc' : 'desc');
+                else { setSort(key); setSortDir('desc'); }
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-all active:scale-95 ${
+                active ? 'bg-red-500 text-white shadow' : 'bg-white text-slate-600 shadow-sm hover:bg-red-50'
+              }`}
+            >
+              <span>{emoji}</span>{label}
+              {showDir && <span className="text-xs">{sortDir === 'desc' ? '↓' : '↑'}</span>}
+            </button>
+          );
+        })}
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
