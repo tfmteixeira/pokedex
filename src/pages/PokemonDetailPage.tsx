@@ -101,9 +101,6 @@ export function PokemonDetailPage() {
     const typeNames = detail.types.map((t) => TYPE_PT[t]);
     const typesPhrase =
       typeNames.length === 1 ? `É do tipo ${typeNames[0]}` : `É dos tipos ${typeNames[0]} e ${typeNames[1]}`;
-    const heightM = (detail.height / 10).toFixed(1).replace('.', ',');
-    const weightKg = (detail.weight / 10).toFixed(1).replace('.', ',');
-    const sizePhrase = `Mede ${heightM} metros e pesa ${weightKg} quilos.`;
     const list = (arr: string[]) =>
       arr.length === 0 ? null : arr.length === 1 ? arr[0] : arr.slice(0, -1).join(', ') + ' e ' + arr[arr.length - 1];
     const weakList = list(weaknesses.map((t) => TYPE_PT[t]));
@@ -312,7 +309,7 @@ function AnimatedSprite({ id, name }: { id: number; name: string }) {
 function useImageCrop(src: string): { contentRatio: number; bottomPadFraction: number; topPadFraction: number } {
   const [crop, setCrop] = useState({ contentRatio: 0.85, bottomPadFraction: 0.05, topPadFraction: 0.10 });
   useEffect(() => {
-    setCrop({ contentRatio: 0.85, bottomPadFraction: 0.05 });
+    setCrop({ contentRatio: 0.85, bottomPadFraction: 0.05, topPadFraction: 0.10 });
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
@@ -500,15 +497,6 @@ function WeightComparison({ weight }: { weight: number }) {
   );
 }
 
-function Fact({ emoji, label, value }: { emoji: string; label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-slate-50 p-4 text-center">
-      <div className="text-3xl mb-1" aria-hidden>{emoji}</div>
-      <div className="text-xs uppercase font-bold text-slate-500">{label}</div>
-      <div className="text-lg font-bold text-slate-800">{value}</div>
-    </div>
-  );
-}
 
 function EvolutionView({
   prev, species, next, megaForms, currentId,
