@@ -7,6 +7,8 @@ export interface PokemonListItem {
   name: string;
   spriteUrl: string;
   types: PokemonType[];
+  height: number; // decimetres
+  weight: number; // hectograms
 }
 
 export interface PokemonDetail {
@@ -133,6 +135,8 @@ export async function fetchPokemonListItem(id: number): Promise<PokemonListItem>
     name: formatDisplayName(data.name),
     spriteUrl: bestSprite(data.sprites, data.id),
     types: data.types.map((t) => t.type.name),
+    height: data.height,
+    weight: data.weight,
   };
 }
 

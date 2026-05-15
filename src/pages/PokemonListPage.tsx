@@ -9,10 +9,13 @@ import { REGIONS } from '../i18n/regions';
 const PAGE_SIZE = 30;
 const SCROLL_KEY = 'pokedex_list_state';
 
+type SortOrder = 'numeric' | 'height' | 'weight';
+
 interface SavedListState {
   search: string;
   region: string | null;
   special: string | null;
+  sort: SortOrder;
   visibleCount: number;
   scrollY: number;
 }
@@ -34,6 +37,7 @@ export function PokemonListPage() {
   const [search, setSearch] = useState(saved?.search ?? '');
   const [region, setRegion] = useState<string | null>(saved?.region ?? null);
   const [special, setSpecial] = useState<string | null>(saved?.special ?? null);
+  const [sort, setSort] = useState<SortOrder>(saved?.sort ?? 'numeric');
   const [visibleCount, setVisibleCount] = useState(saved?.visibleCount ?? PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const pendingScrollRef = useRef<number | null>(saved?.scrollY ?? null);
@@ -88,13 +92,12 @@ export function PokemonListPage() {
     })),
   });
 
-  const visibleItems = useMemo(
-    () =>
-      detailQueries
-        .map((q) => q.data)
-        .filter((x): x is PokemonListItem => !!x),
-    [detailQueries]
-  );
+  const visibleItems = useMemo(() => {
+    const loaded = detailQueries.map((q) => q.data).filter((x): x is PokemonListItem => !!x);
+    if (sort === 'height') return [...loaded].sort((a, b) => b.height - a.height);
+    if (sort === 'weight') return [...loaded].sort((a, b) => b.weight - a.weight);
+    return loaded;
+  }, [detailQueries, sort]);
 
   const stillLoading = detailQueries.some((q) => q.isLoading);
 
@@ -120,8 +123,8 @@ export function PokemonListPage() {
   // every 200ms because saving from useEffect cleanup is unreliable (by the
   // time React's cleanup fires, the old grid has been unmounted and
   // window.scrollY has already been clamped to the shorter detail page).
-  const stateRef = useRef({ visibleCount, search, region, special });
-  stateRef.current = { visibleCount, search, region, special };
+  const stateRef = useRef({ visibleCount, search, region, special, sort });
+  stateRef.current = { visibleCount, search, region, special, sort };
   useEffect(() => {
     const save = () => {
       sessionStorage.setItem(SCROLL_KEY, JSON.stringify({
@@ -169,6 +172,23 @@ export function PokemonListPage() {
             className="w-full pl-12 pr-4 py-3 rounded-full bg-white shadow-md border-2 border-transparent focus:border-red-400 focus:outline-none text-lg"
           />
         </div>
+      </div>
+
+      <div className="mb-3 flex gap-2 items-center">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Ordenar</span>
+        {([['numeric', '🔢', 'Número'], ['height', '📏', 'Altura'], ['weight', '⚖️', 'Peso']] as const).map(([key, emoji, label]) => (
+          <button
+            key={key}
+            onClick={() => setSort(key)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-all active:scale-95 ${
+              sort === key
+                ? 'bg-red-500 text-white shadow'
+                : 'bg-white text-slate-600 shadow-sm hover:bg-red-50'
+            }`}
+          >
+            <span>{emoji}</span>{label}
+          </button>
+        ))}
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
