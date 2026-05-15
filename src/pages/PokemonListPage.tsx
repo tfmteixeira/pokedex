@@ -160,7 +160,7 @@ export function PokemonListPage() {
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [visibleCount, filteredIds.length, stillLoading]);
+  }, [visibleCount, filteredIds.length, stillLoading, sort]);
 
   if (namesQuery.isLoading || (special && specialFormsQuery.isLoading)) return <CenteredSpinner message={UI.loading} />;
   if (namesQuery.isError) return <ErrorBox onRetry={() => namesQuery.refetch()} />;
