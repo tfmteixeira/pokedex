@@ -561,27 +561,32 @@ function Arrow() {
   );
 }
 
+const FORM_STYLES: Record<string, { icon: string; badge: string; ring: string; bg: string; theme: string }> = {
+  'Mega':       { icon: '✨', badge: 'from-purple-500 to-pink-500',   ring: 'ring-purple-400',  bg: 'from-purple-100 to-pink-100',   theme: 'from-purple-50 to-pink-50 ring-2 ring-purple-200' },
+  'Mega X':     { icon: '✨', badge: 'from-purple-500 to-pink-500',   ring: 'ring-purple-400',  bg: 'from-purple-100 to-pink-100',   theme: 'from-purple-50 to-pink-50 ring-2 ring-purple-200' },
+  'Mega Y':     { icon: '✨', badge: 'from-purple-500 to-pink-500',   ring: 'ring-purple-400',  bg: 'from-purple-100 to-pink-100',   theme: 'from-purple-50 to-pink-50 ring-2 ring-purple-200' },
+  'Gigantamax': { icon: '⚡', badge: 'from-red-500 to-orange-400',    ring: 'ring-orange-400',  bg: 'from-red-100 to-orange-100',    theme: 'from-red-50 to-orange-50 ring-2 ring-orange-200' },
+  'Primal':     { icon: '🌊', badge: 'from-teal-500 to-blue-500',     ring: 'ring-teal-400',    bg: 'from-teal-100 to-blue-100',     theme: 'from-teal-50 to-blue-50 ring-2 ring-teal-200' },
+  'Alola':      { icon: '🌺', badge: 'from-yellow-400 to-orange-400', ring: 'ring-orange-300',  bg: 'from-yellow-100 to-orange-100', theme: 'from-yellow-50 to-orange-50 ring-2 ring-orange-200' },
+  'Galar':      { icon: '⚔️', badge: 'from-indigo-500 to-purple-500', ring: 'ring-indigo-400',  bg: 'from-indigo-100 to-purple-100', theme: 'from-indigo-50 to-purple-50 ring-2 ring-indigo-200' },
+  'Hisui':      { icon: '🌿', badge: 'from-amber-600 to-yellow-600',  ring: 'ring-amber-400',   bg: 'from-amber-100 to-yellow-100',  theme: 'from-amber-50 to-yellow-50 ring-2 ring-amber-200' },
+  'Paldea':     { icon: '🌶️', badge: 'from-red-600 to-rose-500',      ring: 'ring-rose-400',    bg: 'from-red-100 to-rose-100',      theme: 'from-red-50 to-rose-50 ring-2 ring-rose-200' },
+};
+const DEFAULT_FORM = { icon: '⭐', badge: 'from-slate-400 to-slate-500', ring: 'ring-slate-300', bg: 'from-slate-100 to-slate-200', theme: 'from-slate-50 to-slate-100 ring-2 ring-slate-200' };
+
 function EvoCard({
   node, mega, highlight = false,
 }: { node?: EvolutionNode; mega?: MegaForm; highlight?: boolean }) {
   const id = mega?.id ?? node?.id ?? 0;
-  const name = capitalize(node?.name ?? mega?.name.replace(/-(mega|gmax|primal).*$/, '') ?? '');
+  const name = capitalize(node?.name ?? mega?.name.replace(/-(mega|gmax|primal|alola|galar|hisui|paldea).*$/i, '') ?? '');
   const sprite = mega?.spriteUrl ?? node?.spriteUrl ?? '';
-  const isGmax   = mega?.label === 'Gigantamax';
-  const isPrimal = mega?.label === 'Primal';
-
-  const badgeClass = isGmax
-    ? 'bg-gradient-to-r from-red-500 to-orange-400'
-    : isPrimal
-    ? 'bg-gradient-to-r from-teal-500 to-blue-500'
-    : 'bg-gradient-to-r from-purple-500 to-pink-500';
-  const badgeIcon = isGmax ? '⚡' : isPrimal ? '🌊' : '✨';
+  const style = mega ? (FORM_STYLES[mega.label] ?? DEFAULT_FORM) : null;
 
   const content = (
     <>
-      {mega && (
-        <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full ${badgeClass} text-white text-[10px] font-bold tracking-wider shadow-md whitespace-nowrap`}>
-          {badgeIcon} {mega.label}
+      {mega && style && (
+        <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r ${style.badge} text-white text-[10px] font-bold tracking-wider shadow-md whitespace-nowrap`}>
+          {style.icon} {mega.label}
         </span>
       )}
       <img src={sprite} alt={name} className="w-20 h-20 sm:w-24 sm:h-24 object-contain" />
@@ -593,25 +598,16 @@ function EvoCard({
   );
 
   const baseClass = `relative flex flex-col items-center gap-1 rounded-2xl p-3 transition-all w-28 sm:w-32`;
-  const specialTheme = isGmax
-    ? 'bg-gradient-to-br from-red-50 to-orange-50 ring-2 ring-orange-200'
-    : isPrimal
-    ? 'bg-gradient-to-br from-teal-50 to-blue-50 ring-2 ring-teal-200'
-    : 'bg-gradient-to-br from-purple-50 to-pink-50 ring-2 ring-purple-200';
 
   if (highlight) {
-    const ring = isGmax ? 'ring-4 ring-orange-400' : isPrimal ? 'ring-4 ring-teal-400' : mega ? 'ring-4 ring-purple-400' : 'ring-4 ring-red-300';
-    const bg = isGmax ? 'from-red-100 to-orange-100' : isPrimal ? 'from-teal-100 to-blue-100' : mega ? 'from-purple-100 to-pink-100' : 'from-red-100 to-yellow-100';
-    return (
-      <div className={`${baseClass} bg-gradient-to-br ${bg} ${ring} shadow-lg`}>
-        {content}
-      </div>
-    );
+    const ring = style ? `ring-4 ${style.ring}` : 'ring-4 ring-red-300';
+    const bg   = style ? style.bg : 'from-red-100 to-yellow-100';
+    return <div className={`${baseClass} bg-gradient-to-br ${bg} ${ring} shadow-lg`}>{content}</div>;
   }
   return (
     <Link
       to={`/pokemon/${id}`}
-      className={`${baseClass} ${mega ? specialTheme : 'bg-slate-50 hover:bg-red-50'} active:scale-95 shadow-sm hover:shadow-md`}
+      className={`${baseClass} ${style ? `bg-gradient-to-br ${style.theme}` : 'bg-slate-50 hover:bg-red-50'} active:scale-95 shadow-sm hover:shadow-md`}
     >
       {content}
     </Link>

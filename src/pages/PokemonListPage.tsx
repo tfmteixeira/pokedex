@@ -54,7 +54,7 @@ export function PokemonListPage() {
 
   const specialFormsQuery = useQuery({
     queryKey: ['special-forms', special],
-    queryFn: () => fetchSpecialForms(special as 'mega' | 'gmax' | 'primal'),
+    queryFn: () => fetchSpecialForms(special!),
     enabled: !!special,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -237,6 +237,30 @@ export function PokemonListPage() {
           onClick={() => { setSpecial(special === 'primal' ? null : 'primal'); setRegion(null); }}
           emoji="🌊"
           label="Primal"
+        />
+        <FilterChip
+          active={special === 'alola'}
+          onClick={() => { setSpecial(special === 'alola' ? null : 'alola'); setRegion(null); }}
+          emoji="🌺"
+          label="Alola"
+        />
+        <FilterChip
+          active={special === 'galar'}
+          onClick={() => { setSpecial(special === 'galar' ? null : 'galar'); setRegion(null); }}
+          emoji="⚔️"
+          label="Galar"
+        />
+        <FilterChip
+          active={special === 'hisui'}
+          onClick={() => { setSpecial(special === 'hisui' ? null : 'hisui'); setRegion(null); }}
+          emoji="🌿"
+          label="Hisui"
+        />
+        <FilterChip
+          active={special === 'paldea'}
+          onClick={() => { setSpecial(special === 'paldea' ? null : 'paldea'); setRegion(null); }}
+          emoji="🌶️"
+          label="Paldea"
         />
       </div>
 
