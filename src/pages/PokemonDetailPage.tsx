@@ -35,6 +35,7 @@ export function PokemonDetailPage() {
   }, [prevId, nextId, navigate]);
 
   // Touch swipe
+  const [shiny, setShiny] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -138,8 +139,6 @@ export function PokemonDetailPage() {
       </div>
     );
   }
-
-  const [shiny, setShiny] = useState(false);
 
   const detail = detailQuery.data;
   const speciesId = speciesQuery.data?.id ?? numericId;
