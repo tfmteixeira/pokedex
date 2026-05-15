@@ -227,13 +227,30 @@ export function PokemonListPage() {
       </div>
 
       {/* Special forms filters */}
-      <div className="mb-6">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Formas</p>
+      <div className="mb-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Formas Especiais</p>
         <div className="flex flex-wrap gap-2">
           {([
             ['mega',   '✨', 'Mega'],
             ['gmax',   '⚡', 'Gigantamax'],
             ['primal', '🌊', 'Primal'],
+          ] as const).map(([key, emoji, label]) => (
+            <FilterChip
+              key={key}
+              active={special === key}
+              onClick={() => { setSpecial(special === key ? null : key); setRegion(null); }}
+              emoji={emoji}
+              label={label}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Regional forms filters */}
+      <div className="mb-6">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Formas Regionais</p>
+        <div className="flex flex-wrap gap-2">
+          {([
             ['alola',  '🌺', 'Alola'],
             ['galar',  '⚔️', 'Galar'],
             ['hisui',  '🌿', 'Hisui'],
