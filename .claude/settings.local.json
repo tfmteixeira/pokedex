@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/tteixeira/**)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npx tailwindcss *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" 'https://pokeapi.co/api/v2/pokemon/404')",
+      "Bash(curl -s 'https://pokeapi.co/api/v2/pokemon/404')",
+      "Read(//usr/local/**)",
+      "Read(//opt/homebrew/opt/**)",
+      "Bash(command -v nvm)",
+      "Bash(mise list *)",
+      "Bash(curl -sI 'https://translate.google.com/translate_tts?ie=UTF-8&q=Ola&tl=pt-PT&client=tw-ob' -A \"Mozilla/5.0\")",
+      "Bash(curl -s -o /dev/null -w \"Proxy: HTTP %{http_code}, content-type: %{content_type}, size: %{size_download} bytes\\\\n\" 'http://localhost:5173/tts?ie=UTF-8&tl=pt-PT&client=tw-ob&q=Ola')",
+      "Bash(python3 -c \"import urllib.parse; print\\(urllib.parse.quote\\('Pikachu. É do tipo Elétrico. Quando muitos destes Pokémon se juntam, podem causar uma trovoada enorme. Mede 0,4 metros e pesa 6,0 quilos. As suas fraquezas são: Terra.'\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"long: HTTP %{http_code} size %{size_download}\\\\n\" \"http://localhost:5173/tts?ie=UTF-8&tl=pt-PT&client=tw-ob&q=$\\(python3 -c \"import urllib.parse; print\\(urllib.parse.quote\\('Pikachu. É do tipo Elétrico. Quando muitos destes Pokémon se juntam, podem causar uma trovoada enorme. Mede 0,4 metros e pesa 6,0 quilos. As suas fraquezas são: Terra.'\\)\\)\"\\)\")",
+      "Bash(python3 -c \"import urllib.parse; print\\(urllib.parse.quote\\('Quando muitos destes Pokémon se juntam, podem causar uma trovoada enorme.'\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"short: HTTP %{http_code} size %{size_download}\\\\n\" \"http://localhost:5173/tts?ie=UTF-8&tl=pt-PT&client=tw-ob&q=$\\(python3 -c \"import urllib.parse; print\\(urllib.parse.quote\\('Quando muitos destes Pokémon se juntam, podem causar uma trovoada enorme.'\\)\\)\"\\)\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} ct:%{content_type} size:%{size_download}\\\\n\" 'http://localhost:5173/tts?ie=UTF-8&tl=pt-PT&client=tw-ob&q=Ola')",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/__TRACKED_VAR__.gif)"
+    ]
+  }
+}
