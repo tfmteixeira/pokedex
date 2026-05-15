@@ -275,7 +275,7 @@ export function PokemonDetailPage() {
         {/* Quick facts */}
         <section className="p-6 sm:p-8 border-t border-slate-100 space-y-4">
           <HeightComparison height={detail.height} name={detail.name} spriteUrl={detail.spriteUrl} />
-          <WeightComparison weight={detail.weight} />
+          <WeightComparison weight={detail.weight} name={detail.name} />
         </section>
 
         {/* Evolution chain */}
@@ -504,10 +504,13 @@ function buildWeightBreakdown(kg: number) {
   return items;
 }
 
-function WeightComparison({ weight }: { weight: number }) {
+function WeightComparison({ weight, name }: { weight: number; name: string }) {
+  const isGmax = /-gmax$/i.test(name);
   const kg = weight / 10;
-  const items = buildWeightBreakdown(kg);
-  const kgStr = kg % 1 === 0 ? `${kg.toFixed(0)} kg` : `${kg.toFixed(1).replace('.', ',')} kg`;
+  const items = isGmax ? [] : buildWeightBreakdown(kg);
+  const kgStr = isGmax
+    ? '??? kg'
+    : kg % 1 === 0 ? `${kg.toFixed(0)} kg` : `${kg.toFixed(1).replace('.', ',')} kg`;
 
   // Compact legend for parents: unique refs with their weight.
   const seen = new Set<string>();
@@ -521,12 +524,18 @@ function WeightComparison({ weight }: { weight: number }) {
       <div className="text-xs uppercase font-bold text-slate-500 mb-1">⚖️ {UI.weight}</div>
       <div className="text-center">
         <div className="text-2xl font-bold text-slate-800 mb-3">{kgStr}</div>
-        <div className="flex flex-wrap gap-1 items-center justify-center">
-          {items.map((ref, i) => (
-            <span key={i} className="text-3xl leading-none">{ref.emoji}</span>
-          ))}
-        </div>
-        <div className="text-xs text-slate-400 mt-2">{legend}</div>
+        {isGmax ? (
+          <p className="text-sm text-slate-400 italic">Demasiado grande para medir</p>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-1 items-center justify-center">
+              {items.map((ref, i) => (
+                <span key={i} className="text-3xl leading-none">{ref.emoji}</span>
+              ))}
+            </div>
+            <div className="text-xs text-slate-400 mt-2">{legend}</div>
+          </>
+        )}
       </div>
     </div>
   );
