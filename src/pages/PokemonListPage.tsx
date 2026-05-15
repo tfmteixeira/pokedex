@@ -54,7 +54,7 @@ export function PokemonListPage() {
 
   const specialFormsQuery = useQuery({
     queryKey: ['special-forms', special],
-    queryFn: () => fetchSpecialForms(special as 'mega' | 'gmax'),
+    queryFn: () => fetchSpecialForms(special as 'mega' | 'gmax' | 'primal'),
     enabled: !!special,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -231,6 +231,12 @@ export function PokemonListPage() {
           onClick={() => { setSpecial(special === 'gmax' ? null : 'gmax'); setRegion(null); }}
           emoji="⚡"
           label="Gigantamax"
+        />
+        <FilterChip
+          active={special === 'primal'}
+          onClick={() => { setSpecial(special === 'primal' ? null : 'primal'); setRegion(null); }}
+          emoji="🌊"
+          label="Primal"
         />
       </div>
 

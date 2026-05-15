@@ -140,12 +140,11 @@ export async function fetchPokemonListItem(id: number): Promise<PokemonListItem>
   };
 }
 
-export async function fetchSpecialForms(formType: 'mega' | 'gmax'): Promise<{ name: string; id: number }[]> {
+export async function fetchSpecialForms(formType: 'mega' | 'gmax' | 'primal'): Promise<{ name: string; id: number }[]> {
   const data = await fetchJson<{ results: { name: string; url: string }[] }>(
     `${BASE}/pokemon?limit=10000`
   );
-  // Anchor to end of string so we don't match unrelated names that happen to contain "mega"
-  const pattern = formType === 'mega' ? /-mega(?:-[xy])?$/i : /-gmax$/i;
+  const pattern = formType === 'mega' ? /-mega(?:-[xy])?$/i : formType === 'gmax' ? /-gmax$/i : /-primal$/i;
   return data.results
     .map((r) => {
       const idMatch = r.url.match(/\/pokemon\/(\d+)\//);
@@ -185,6 +184,8 @@ function specialFormLabel(name: string): string | null {
   if (megaMatch) return megaMatch[1] ? `Mega ${megaMatch[1].toUpperCase()}` : 'Mega';
   // Gigantamax: -gmax
   if (/-gmax$/i.test(name)) return 'Gigantamax';
+  // Primal Reversion: -primal
+  if (/-primal$/i.test(name)) return 'Primal';
   return null;
 }
 

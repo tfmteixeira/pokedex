@@ -565,14 +565,17 @@ function EvoCard({
   node, mega, highlight = false,
 }: { node?: EvolutionNode; mega?: MegaForm; highlight?: boolean }) {
   const id = mega?.id ?? node?.id ?? 0;
-  const name = capitalize(node?.name ?? mega?.name.replace(/-(mega|gmax).*$/, '') ?? '');
+  const name = capitalize(node?.name ?? mega?.name.replace(/-(mega|gmax|primal).*$/, '') ?? '');
   const sprite = mega?.spriteUrl ?? node?.spriteUrl ?? '';
-  const isGmax = mega?.label === 'Gigantamax';
+  const isGmax   = mega?.label === 'Gigantamax';
+  const isPrimal = mega?.label === 'Primal';
 
   const badgeClass = isGmax
     ? 'bg-gradient-to-r from-red-500 to-orange-400'
+    : isPrimal
+    ? 'bg-gradient-to-r from-teal-500 to-blue-500'
     : 'bg-gradient-to-r from-purple-500 to-pink-500';
-  const badgeIcon = isGmax ? '⚡' : '✨';
+  const badgeIcon = isGmax ? '⚡' : isPrimal ? '🌊' : '✨';
 
   const content = (
     <>
@@ -592,11 +595,13 @@ function EvoCard({
   const baseClass = `relative flex flex-col items-center gap-1 rounded-2xl p-3 transition-all w-28 sm:w-32`;
   const specialTheme = isGmax
     ? 'bg-gradient-to-br from-red-50 to-orange-50 ring-2 ring-orange-200'
+    : isPrimal
+    ? 'bg-gradient-to-br from-teal-50 to-blue-50 ring-2 ring-teal-200'
     : 'bg-gradient-to-br from-purple-50 to-pink-50 ring-2 ring-purple-200';
 
   if (highlight) {
-    const ring = isGmax ? 'ring-4 ring-orange-400' : mega ? 'ring-4 ring-purple-400' : 'ring-4 ring-red-300';
-    const bg = isGmax ? 'from-red-100 to-orange-100' : mega ? 'from-purple-100 to-pink-100' : 'from-red-100 to-yellow-100';
+    const ring = isGmax ? 'ring-4 ring-orange-400' : isPrimal ? 'ring-4 ring-teal-400' : mega ? 'ring-4 ring-purple-400' : 'ring-4 ring-red-300';
+    const bg = isGmax ? 'from-red-100 to-orange-100' : isPrimal ? 'from-teal-100 to-blue-100' : mega ? 'from-purple-100 to-pink-100' : 'from-red-100 to-yellow-100';
     return (
       <div className={`${baseClass} bg-gradient-to-br ${bg} ${ring} shadow-lg`}>
         {content}
