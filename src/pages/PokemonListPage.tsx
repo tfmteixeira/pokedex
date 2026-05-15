@@ -224,17 +224,31 @@ export function PokemonListPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-        {visibleItems.map((p) => (
-          <PokemonCard key={p.id} pokemon={p} />
-        ))}
-        {stillLoading &&
-          Array.from({ length: Math.max(0, idsToShow.length - visibleItems.length) })
-            .slice(0, 10)
-            .map((_, i) => (
-              <div key={`sk-${i}`} className="aspect-[3/4] rounded-3xl bg-white/40 animate-pulse" />
-            ))}
-      </div>
+      {stillLoading && sort !== 'numeric' ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <img src="/pokeball.svg" alt="" className="w-16 h-16 animate-spin" />
+          <p className="text-slate-600 font-medium">A carregar dados...</p>
+          <div className="w-64 bg-white rounded-full h-3 shadow-inner overflow-hidden">
+            <div
+              className="h-3 bg-gradient-to-r from-red-400 to-red-500 rounded-full transition-all duration-300"
+              style={{ width: `${Math.round((visibleItems.length / idsToShow.length) * 100)}%` }}
+            />
+          </div>
+          <p className="text-sm text-slate-400">{visibleItems.length} / {idsToShow.length}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          {visibleItems.map((p) => (
+            <PokemonCard key={p.id} pokemon={p} />
+          ))}
+          {stillLoading &&
+            Array.from({ length: Math.max(0, idsToShow.length - visibleItems.length) })
+              .slice(0, 10)
+              .map((_, i) => (
+                <div key={`sk-${i}`} className="aspect-[3/4] rounded-3xl bg-white/40 animate-pulse" />
+              ))}
+        </div>
+      )}
 
       {sort === 'numeric' && visibleCount < filteredIds.length && <div ref={sentinelRef} className="h-8 mt-4" />}
 
