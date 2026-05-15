@@ -38,7 +38,11 @@ export interface PokemonSpecies {
   flavorTextEn: string;
   flavorTextEs: string;
   evolutionChainUrl: string;
-  megaForms: MegaForm[];
+  megaForms: MegaForm[];      // Mega X / Mega Y / Mega
+  gmaxForms: MegaForm[];      // Gigantamax
+  primalForms: MegaForm[];    // Primal
+  regionalForms: MegaForm[];  // Alola / Galar / Hisui / Paldea
+  otherForms: MegaForm[];     // everything else non-default
 }
 
 export interface EvolutionNode {
@@ -212,20 +216,38 @@ export async function fetchSpecies(speciesUrl: string): Promise<PokemonSpecies> 
   const flavorTextEn = cleanFlavor(data.flavor_text_entries.find((f) => f.language.name === 'en')?.flavor_text);
   const flavorTextEs = cleanFlavor(data.flavor_text_entries.find((f) => f.language.name === 'es')?.flavor_text);
 
-  const megaForms: MegaForm[] = data.varieties
-    .map((v) => {
-      const label = specialFormLabel(v.pokemon.name);
-      if (!label) return null;
-      const idMatch = v.pokemon.url.match(/\/pokemon\/(\d+)\//);
-      const id = idMatch ? Number(idMatch[1]) : 0;
-      return {
-        id,
-        name: v.pokemon.name,
-        label,
-        spriteUrl: officialArtwork(id),
-      };
-    })
-    .filter((m): m is MegaForm => m !== null);
+  const REGIONAL_LABELS = new Set(['Alola', 'Galar', 'Hisui', 'Paldea']);
+
+  const megaForms: MegaForm[] = [];
+  const gmaxForms: MegaForm[] = [];
+  const primalForms: MegaForm[] = [];
+  const regionalForms: MegaForm[] = [];
+  const otherForms: MegaForm[] = [];
+
+  for (const v of data.varieties) {
+    if (v.is_default) continue;
+    const idMatch = v.pokemon.url.match(/\/pokemon\/(\d+)\//);
+    const id = idMatch ? Number(idMatch[1]) : 0;
+    if (!id) continue;
+
+    const special = specialFormLabel(v.pokemon.name);
+    if (special) {
+      const form: MegaForm = { id, name: v.pokemon.name, label: special, spriteUrl: officialArtwork(id) };
+      if (special.startsWith('Mega')) megaForms.push(form);
+      else if (special === 'Gigantamax') gmaxForms.push(form);
+      else if (special === 'Primal') primalForms.push(form);
+      else if (REGIONAL_LABELS.has(special)) regionalForms.push(form);
+      else otherForms.push(form);
+    } else {
+      // derive a label from the suffix after the species name
+      const prefix = data.name + '-';
+      const suffix = v.pokemon.name.startsWith(prefix)
+        ? v.pokemon.name.slice(prefix.length)
+        : v.pokemon.name;
+      const label = suffix.split('-').map((p: string) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      otherForms.push({ id, name: v.pokemon.name, label, spriteUrl: officialArtwork(id) });
+    }
+  }
 
   return {
     id: data.id,
@@ -235,6 +257,10 @@ export async function fetchSpecies(speciesUrl: string): Promise<PokemonSpecies> 
     flavorTextEs,
     evolutionChainUrl: data.evolution_chain.url,
     megaForms,
+    gmaxForms,
+    primalForms,
+    regionalForms,
+    otherForms,
   };
 }
 

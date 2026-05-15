@@ -69,10 +69,19 @@ export function PokemonDetailPage() {
     staleTime: 1000 * 60 * 60,
   });
 
-  // For mega/variant forms, the canonical species name + a "Mega" label.
+  // For mega/variant forms, the canonical species name + a label.
   const displayName = useMemo(() => {
     if (!detailQuery.data || !speciesQuery.data) return '';
-    const mega = speciesQuery.data.megaForms.find((m) => m.id === detailQuery.data!.id);
+    const allSpecialForms = speciesQuery.data
+      ? [
+          ...speciesQuery.data.megaForms,
+          ...speciesQuery.data.gmaxForms,
+          ...speciesQuery.data.primalForms,
+          ...speciesQuery.data.regionalForms,
+          ...speciesQuery.data.otherForms,
+        ]
+      : [];
+    const mega = allSpecialForms.find((m) => m.id === detailQuery.data!.id);
     if (mega) return `${capitalize(speciesQuery.data.name)} ${mega.label}`;
     return capitalize(detailQuery.data.name);
   }, [detailQuery.data, speciesQuery.data]);
@@ -269,22 +278,34 @@ export function PokemonDetailPage() {
           <WeightComparison weight={detail.weight} />
         </section>
 
-        {/* Evolution */}
+        {/* Evolution chain */}
         <section className="p-6 sm:p-8 border-t border-slate-100">
-          <h2 className="text-xl font-bold text-slate-800 mb-3">
-            🌱 {UI.evolution}
-          </h2>
+          <h2 className="text-xl font-bold text-slate-800 mb-3">🌱 {UI.evolution}</h2>
           {chainQuery.isLoading && <p className="text-slate-500">{UI.loading}</p>}
           {chainQuery.data && (
             <EvolutionView
               prev={neighbors.prev}
               species={speciesNode}
               next={neighbors.next}
-              megaForms={speciesQuery.data?.megaForms ?? []}
               currentId={detail.id}
             />
           )}
         </section>
+
+        {/* Mega */}
+        <FormsSection title="✨ Mega" forms={speciesQuery.data?.megaForms ?? []} currentId={detail.id} />
+
+        {/* Gigantamax */}
+        <FormsSection title="⚡ Gigantamax" forms={speciesQuery.data?.gmaxForms ?? []} currentId={detail.id} />
+
+        {/* Primal */}
+        <FormsSection title="🌊 Primal" forms={speciesQuery.data?.primalForms ?? []} currentId={detail.id} />
+
+        {/* Regional forms */}
+        <FormsSection title="🌍 Formas Regionais" forms={speciesQuery.data?.regionalForms ?? []} currentId={detail.id} />
+
+        {/* Other forms */}
+        <FormsSection title="🔄 Outras Formas" forms={speciesQuery.data?.otherForms ?? []} currentId={detail.id} />
       </div>
     </div>
   );
@@ -512,19 +533,32 @@ function WeightComparison({ weight }: { weight: number }) {
 }
 
 
+function FormsSection({ title, forms, currentId }: { title: string; forms: MegaForm[]; currentId: number }) {
+  if (forms.length === 0) return null;
+  return (
+    <section className="p-6 sm:p-8 border-t border-slate-100">
+      <h2 className="text-xl font-bold text-slate-800 mb-4">{title}</h2>
+      <div className="flex flex-wrap gap-3 justify-center">
+        {forms.map((f) => (
+          <EvoCard key={f.id} mega={f} highlight={f.id === currentId} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function EvolutionView({
-  prev, species, next, megaForms, currentId,
+  prev, species, next, currentId,
 }: {
   prev: EvolutionNode | null;
   species: EvolutionNode;
   next: EvolutionNode[];
-  megaForms: MegaForm[];
   currentId: number;
 }) {
-  if (!prev && next.length === 0 && megaForms.length === 0) {
+  if (!prev && next.length === 0) {
     return <p className="text-slate-500">{UI.noEvolution}</p>;
   }
-  const branchCount = next.length + megaForms.length;
+  const branchCount = next.length;
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
       {prev && (
@@ -539,9 +573,6 @@ function EvolutionView({
           <Arrow />
           <div className={`grid ${branchCount > 1 ? 'grid-cols-2' : 'grid-cols-1'} sm:grid-cols-1 gap-2 justify-items-center`}>
             {next.map((n) => <EvoCard key={n.id} node={n} highlight={n.id === currentId} />)}
-            {megaForms.map((m) => (
-              <EvoCard key={m.id} mega={m} highlight={m.id === currentId} />
-            ))}
           </div>
         </>
       )}

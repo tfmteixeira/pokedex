@@ -203,65 +203,51 @@ export function PokemonListPage() {
         })}
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-2">
-        <FilterChip
-          active={region === null && special === null}
-          onClick={() => { setRegion(null); setSpecial(null); }}
-          emoji="🌍"
-          label={UI.allRegions}
-        />
-        {REGIONS.map((r) => (
+      {/* Região filters */}
+      <div className="mb-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Região</p>
+        <div className="flex flex-wrap gap-2">
           <FilterChip
-            key={r.key}
-            active={region === r.key}
-            onClick={() => { setRegion(region === r.key ? null : r.key); setSpecial(null); }}
-            emoji={r.emoji}
-            label={r.name}
-            sublabel={`Gen ${r.generation}`}
+            active={region === null && special === null}
+            onClick={() => { setRegion(null); setSpecial(null); }}
+            emoji="🌍"
+            label={UI.allRegions}
           />
-        ))}
-        <FilterChip
-          active={special === 'mega'}
-          onClick={() => { setSpecial(special === 'mega' ? null : 'mega'); setRegion(null); }}
-          emoji="✨"
-          label="Mega"
-        />
-        <FilterChip
-          active={special === 'gmax'}
-          onClick={() => { setSpecial(special === 'gmax' ? null : 'gmax'); setRegion(null); }}
-          emoji="⚡"
-          label="Gigantamax"
-        />
-        <FilterChip
-          active={special === 'primal'}
-          onClick={() => { setSpecial(special === 'primal' ? null : 'primal'); setRegion(null); }}
-          emoji="🌊"
-          label="Primal"
-        />
-        <FilterChip
-          active={special === 'alola'}
-          onClick={() => { setSpecial(special === 'alola' ? null : 'alola'); setRegion(null); }}
-          emoji="🌺"
-          label="Alola"
-        />
-        <FilterChip
-          active={special === 'galar'}
-          onClick={() => { setSpecial(special === 'galar' ? null : 'galar'); setRegion(null); }}
-          emoji="⚔️"
-          label="Galar"
-        />
-        <FilterChip
-          active={special === 'hisui'}
-          onClick={() => { setSpecial(special === 'hisui' ? null : 'hisui'); setRegion(null); }}
-          emoji="🌿"
-          label="Hisui"
-        />
-        <FilterChip
-          active={special === 'paldea'}
-          onClick={() => { setSpecial(special === 'paldea' ? null : 'paldea'); setRegion(null); }}
-          emoji="🌶️"
-          label="Paldea"
-        />
+          {REGIONS.map((r) => (
+            <FilterChip
+              key={r.key}
+              active={region === r.key}
+              onClick={() => { setRegion(region === r.key ? null : r.key); setSpecial(null); }}
+              emoji={r.emoji}
+              label={r.name}
+              sublabel={`Gen ${r.generation}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Special forms filters */}
+      <div className="mb-6">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Formas</p>
+        <div className="flex flex-wrap gap-2">
+          {([
+            ['mega',   '✨', 'Mega'],
+            ['gmax',   '⚡', 'Gigantamax'],
+            ['primal', '🌊', 'Primal'],
+            ['alola',  '🌺', 'Alola'],
+            ['galar',  '⚔️', 'Galar'],
+            ['hisui',  '🌿', 'Hisui'],
+            ['paldea', '🌶️', 'Paldea'],
+          ] as const).map(([key, emoji, label]) => (
+            <FilterChip
+              key={key}
+              active={special === key}
+              onClick={() => { setSpecial(special === key ? null : key); setRegion(null); }}
+              emoji={emoji}
+              label={label}
+            />
+          ))}
+        </div>
       </div>
 
       {stillLoading && sort !== 'numeric' ? (
