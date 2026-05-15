@@ -36,6 +36,7 @@ export function PokemonDetailPage() {
 
   // Touch swipe
   const [shiny, setShiny] = useState(false);
+  useEffect(() => { setShiny(false); }, [numericId]);
   const touchStartX = useRef<number | null>(null);
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
