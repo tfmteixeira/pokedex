@@ -77,9 +77,11 @@ export function PokemonListPage() {
       .sort((a, b) => a - b);
   }, [namesQuery.data, specialFormsQuery.data, search, region, special]);
 
+  // When sorting by height/weight we need all data to sort correctly —
+  // disable pagination and load everything at once.
   const idsToShow = useMemo(
-    () => filteredIds.slice(0, visibleCount),
-    [filteredIds, visibleCount]
+    () => sort === 'numeric' ? filteredIds.slice(0, visibleCount) : filteredIds,
+    [filteredIds, visibleCount, sort]
   );
 
   const detailQueries = useQueries({
@@ -234,7 +236,7 @@ export function PokemonListPage() {
             ))}
       </div>
 
-      {visibleCount < filteredIds.length && <div ref={sentinelRef} className="h-8 mt-4" />}
+      {sort === 'numeric' && visibleCount < filteredIds.length && <div ref={sentinelRef} className="h-8 mt-4" />}
 
       {!stillLoading && visibleItems.length === 0 && filteredIds.length === 0 && (
         <p className="text-center text-slate-500 py-8">
